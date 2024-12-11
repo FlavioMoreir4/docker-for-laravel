@@ -1,0 +1,26 @@
+name: Deploy to Testing
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v2
+
+      - name: Set up Kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          export KUBECONFIG=kubeconfig.yaml
+
+      - name: Deploy to Kubernetes (Test)
+        run: |
+          kubectl apply -f k8s/test/deployment.yaml
+          kubectl apply -f k8s/test/service.yaml

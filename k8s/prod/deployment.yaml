@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-prod
+  labels:
+    app: laravel-prod
+spec:
+  replicas: 4 # Replicação para garantir alta disponibilidade em produção
+  selector:
+    matchLabels:
+      app: laravel-prod
+  template:
+    metadata:
+      labels:
+        app: laravel-prod
+    spec:
+      containers:
+        - name: laravel-php
+          image: laravel-php:prod # Docker image de produção
+          ports:
+            - containerPort: 9000
+          env:
+            - name: APP_ENV
+              value: "production"
+            - name: DB_HOST
+              value: "mysql"
+            - name: LOG_LEVEL
+              value: "error" # Menos verbosidade em produção
+          volumeMounts:
+            - mountPath: /var/www/html
+              name: html-volume
+      volumes:
+        - name: html-volume
+          persistentVolumeClaim:
+            claimName: laravel-pvc-prod

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-test
+  labels:
+    app: laravel-test
+spec:
+  replicas: 3 # Replicação maior para simular tráfego em teste
+  selector:
+    matchLabels:
+      app: laravel-test
+  template:
+    metadata:
+      labels:
+        app: laravel-test
+    spec:
+      containers:
+        - name: laravel-php
+          image: laravel-php:test
+          ports:
+            - containerPort: 9000
+          env:
+            - name: APP_ENV
+              value: "testing"
+            - name: DB_HOST
+              value: "mysql"
+          volumeMounts:
+            - mountPath: /var/www/html
+              name: html-volume
+      volumes:
+        - name: html-volume
+          persistentVolumeClaim:
+            claimName: laravel-pvc-test

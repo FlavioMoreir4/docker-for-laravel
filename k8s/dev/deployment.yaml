@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-dev
+  labels:
+    app: laravel-dev
+spec:
+  replicas: 2 # Número de réplicas para garantir disponibilidade durante o desenvolvimento
+  selector:
+    matchLabels:
+      app: laravel-dev
+  template:
+    metadata:
+      labels:
+        app: laravel-dev
+    spec:
+      containers:
+        - name: laravel-php
+          image: laravel-php:dev # Docker image para desenvolvimento
+          ports:
+            - containerPort: 9000
+          env:
+            - name: APP_ENV
+              value: "development"
+            - name: DB_HOST
+              value: "mysql"
+          volumeMounts:
+            - mountPath: /var/www/html
+              name: html-volume
+      volumes:
+        - name: html-volume
+          persistentVolumeClaim:
+            claimName: laravel-pvc-dev

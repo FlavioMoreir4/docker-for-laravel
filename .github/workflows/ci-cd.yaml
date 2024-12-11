@@ -1,0 +1,65 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Executa para a branch principal
+      - dev # Executa para a branch de desenvolvimento
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t laravel-php:latest .
+
+      - name: Run tests
+        run: |
+          docker-compose run --rm php php artisan test  # Rodar testes com Laravel
+
+      - name: Push Docker image to Docker Hub
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker tag laravel-php:latest yourdockerhub/laravel-php:latest
+          docker push yourdockerhub/laravel-php:latest  # Empurrar para o Docker Hub
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v2
+
+      - name: Set up Kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          export KUBECONFIG=kubeconfig.yaml
+
+      - name: Deploy to Kubernetes (Dev)
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          kubectl apply -f k8s/dev/deployment.yaml
+          kubectl apply -f k8s/dev/service.yaml
+
+      - name: Deploy to Kubernetes (Test)
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          kubectl apply -f k8s/test/deployment.yaml
+          kubectl apply -f k8s/test/service.yaml
+
+      - name: Deploy to Kubernetes (Prod)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          kubectl apply -f k8s/prod/deployment.yaml
+          kubectl apply -f k8s/prod/service.yaml

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: laravel-pvc-prod
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi # Armazenamento para persistir dados críticos em produção

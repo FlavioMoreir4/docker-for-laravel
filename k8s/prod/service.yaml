@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-prod-service
+spec:
+  selector:
+    app: laravel-prod
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9000
+  type: LoadBalancer
