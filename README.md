@@ -59,7 +59,21 @@ Contém configurações para implantação no Kubernetes.
 
 ### Arquivos na raiz
 
-- **.env.example**: Arquivo de exemplo para variáveis de ambiente usadas no projeto.
+- **.env.docker.example**: Este arquivo contém apenas as variáveis de ambiente específicas para o funcionamento do ambiente Docker. Para evitar conflitos com o `.env` do Laravel, copie manualmente as variáveis necessárias para o final do arquivo `.env` existente no seu projeto Laravel. Uma forma prática de realizar isso:
+
+```bash
+cat .env.docker.example >> .env
+```
+
+Conteúdo do arquivo:
+
+```
+MYSQL_ROOT_PASSWORD="${DB_PASSWORD}Root"
+MYSQL_DATABASE="${DB_DATABASE}"
+MYSQL_USER="${DB_USERNAME}"
+MYSQL_PASSWORD="${DB_PASSWORD}"
+```
+
 - **docker-compose.dev.yml**: Configuração do Docker Compose para o ambiente de desenvolvimento.
 - **docker-compose.prod.yml**: Configuração do Docker Compose para o ambiente de produção.
 
@@ -88,10 +102,10 @@ mv docker-setup/* ./ && mv docker-setup/.* ./ && rmdir docker-setup
 
 ### 3. Ajuste do Arquivo `.env`
 
-Copie o arquivo `.env.example` e ajuste as variáveis de ambiente conforme o seu projeto:
+Copie as variáveis de ambiente do `.env.docker.example` deste repositório para o final do seu `.env` do Laravel para evitar conflitos. Use o comando:
 
 ```bash
-cp .env.example .env
+cat .env.docker.example >> .env
 ```
 
 ### 4. Suba os Contêiners
@@ -136,6 +150,6 @@ Certifique-se de que os workflows do GitHub Actions em `.github/workflows` estã
 
 Fique à vontade para abrir issues ou enviar PRs com melhorias ou correções para este repositório.
 
-<!-- ## Licença
+## Licença
 
-Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais informações. -->
+Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais informações.
